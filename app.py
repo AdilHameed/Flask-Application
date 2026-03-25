@@ -13,6 +13,7 @@ load_dotenv()
 client = MongoClient(os.getenv("MONGO_URI"))
 db = client["test_db"]
 collection = db["students"]
+collection2 = db["todo_items"]
 
 # 1. API Route
 @app.route('/api')
@@ -49,6 +50,21 @@ def success():
 @app.route('/todo')
 def todo():
     return render_template('todo.html')
+
+@app.route('/submittodoitem', methods=['POST'])
+def submit_todo():
+    try:
+        item_name = request.form['itemName']
+        item_desc = request.form['itemDescription']
+
+        collection2.insert_one({
+            "itemName": item_name,
+            "itemDescription": item_desc
+        })
+
+        return "Item added successfully!"
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 if __name__ == '__main__':
     app.run(debug=True)
